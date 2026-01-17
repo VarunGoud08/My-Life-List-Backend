@@ -39,17 +39,10 @@ public class ItemController {
     // --- Upload ---
     @PostMapping("/upload")
     public String uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-        String uploadDir = "uploads/";
-        java.io.File directory = new java.io.File(uploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        java.nio.file.Path filePath = java.nio.file.Paths.get(uploadDir + fileName);
-        java.nio.file.Files.write(filePath, file.getBytes());
-
-        return "/uploads/" + fileName;
+        // Convert to Base64 for persistent storage in DB (Avoids ephemeral file system
+        // issues on Render)
+        String base64 = java.util.Base64.getEncoder().encodeToString(file.getBytes());
+        return "data:" + file.getContentType() + ";base64," + base64;
     }
 
     @DeleteMapping("/watch/{id}")

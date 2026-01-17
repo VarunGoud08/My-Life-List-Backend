@@ -120,7 +120,7 @@ public abstract class BaseItem {
         this.updatedDate = updatedDate;
     }
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
     public String getImageUrl() {
