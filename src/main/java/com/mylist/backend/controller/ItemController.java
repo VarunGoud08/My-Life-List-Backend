@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173") // Allow Frontend Access
+@CrossOrigin(origins = "*") // Allow All Access for Deploy
 public class ItemController {
 
     private final ItemService itemService;
