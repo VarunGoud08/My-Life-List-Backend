@@ -15,22 +15,23 @@ public class ExternalMovieService {
     private String apiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String BASE_URL = "http://www.omdbapi.com/";
+    private final String BASE_URL = "https://www.omdbapi.com/";
 
     // Search for movies (list)
     public List<Map<String, Object>> searchMovies(String query, int page) {
         if (apiKey == null || apiKey.contains("YOUR_OMDB_API_KEY_HERE")) {
+            System.err.println("OMDB API Key is missing or invalid.");
             return Collections.emptyList();
         }
 
-        // Removed &type=movie to allow searching for Series and Episodes as well
         String url = String.format("%s?apikey=%s&s=%s&page=%d", BASE_URL, apiKey.trim(), query, page);
+        System.out.println("Searching OMDb for: " + query); // Debug Log
 
         try {
             Map result = restTemplate.getForObject(url, Map.class);
             if (result != null && result.containsKey("Search")) {
                 List<Map<String, Object>> searchResults = (List<Map<String, Object>>) result.get("Search");
-
+                System.out.println("Found " + searchResults.size() + " results.");
                 return searchResults.stream()
                         .map(m -> {
                             Map<String, Object> map = new java.util.HashMap<>();
@@ -42,8 +43,14 @@ public class ExternalMovieService {
                             return map;
                         })
                         .collect(Collectors.toList());
+            } else {
+                System.out.println("No results found or 'Search' key missing. Response: " + result);
+                if (result != null && result.containsKey("Error")) {
+                    System.err.println("OMDb Error: " + result.get("Error"));
+                }
             }
         } catch (Exception e) {
+            System.err.println("Exception while searching OMDb: " + e.getMessage());
             e.printStackTrace();
         }
         return Collections.emptyList();
